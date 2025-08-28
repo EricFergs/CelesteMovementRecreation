@@ -100,7 +100,7 @@ func getInputAxis():
 	if axis.y != 0 && new_x_axis == 0:
 		axis.x = 0;
 	axis = axis.normalized()
-	print(axis)
+	
 	
 func dash(delta: float):
 	if !hasDashed:
