@@ -74,7 +74,7 @@ func _physics_process(delta: float) -> void:
 	
 	jumpBuffer(delta)
 
-	if Input.is_action_just_pressed("jump"):
+	if Input.is_action_just_pressed("space"):
 		if canJump:
 			jump(delta)
 			frictionOnAir()
@@ -93,17 +93,19 @@ func _physics_process(delta: float) -> void:
 
 func getInputAxis():
 	var new_x_axis = 0
-	new_x_axis = int(Input.is_action_just_pressed("A")) - int(Input.is_action_just_pressed("D"))
-	axis.y = int(Input.is_action_pressed("S")) - int(Input.is_action_pressed("D"))
+	new_x_axis = int(Input.is_action_pressed("D")) - int(Input.is_action_pressed("A"))
+	axis.y = int(Input.is_action_pressed("S")) - int(Input.is_action_pressed("space"))
 	if new_x_axis != 0:
 		axis.x = new_x_axis
 	if axis.y != 0 && new_x_axis == 0:
 		axis.x = 0;
 	axis = axis.normalized()
+	print(axis)
 	
 func dash(delta: float):
 	if !hasDashed:
 		if Input.is_action_just_pressed("dash"):
+			
 			velocity = axis * DASH_SPEED * delta
 			spriteColor = "blue"
 			Input.start_joy_vibration(0, 1, 1, 0.2)
@@ -181,13 +183,19 @@ func jumpBuffer(delta: float):
 		jumpBufferTimer -= 1
 
 func jump(delta: float):
-	pass
+	velocity.y = -JUMP_HEIGHT * delta
 
 func frictionOnAir():
-	pass
+	if friction:
+		velocity.x = lerp(velocity.x, 0.0, 0.01)
 
 func wallJump(delta:float):
-	pass
+	wallJumpTimer = 0
+	velocity.x = -WALL_JUMP_AMOUNT * $Rotatable.scale.x * delta
+	velocity.y = -JUMP_HEIGHT * delta
+	$Rotatable.scale.x = -$Rotatable.scale.x
 
 func setJumpHeight(delta:float):
-	pass
+	if Input.is_action_just_released("space"):
+		if velocity.y < -MIN_JUMP_HEIGHT * delta:
+			velocity.y = -MIN_JUMP_HEIGHT * delta
